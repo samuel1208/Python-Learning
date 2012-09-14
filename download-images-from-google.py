@@ -44,13 +44,13 @@ def Download(URLs):
     for url in URLs :
         imgPath = re.findall(reP5,url)
         imgPath = savePATH + imgPath[0]
-        try:
-            print (url)
+        # can judge the image size first
+        #print(int(urllib.urlopen(url).headers.dict['content-length']))
+        try:        
             if '2' == pyVersion:
                 urllib.urlretrieve(url, imgPath)
             elif '3' == pyVersion:
                 urllib.request.urlretrieve(url, imgPath)
-            print ("ok")
         except: 
             print ('download file failed : %s'%url)
             pass
