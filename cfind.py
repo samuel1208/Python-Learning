@@ -1,5 +1,6 @@
 #!/home/fshen/Install_samuel/Python/python3.2.3/bin/python3
-#todo. skip temp file begin with #
+#todo. skip temp file begin with 
+#skip big file
 # add some option
 
 
@@ -30,7 +31,7 @@ def IterateFile(basePath, reExp):
             f=open(path)
             lineNum = 1
             for line in f:
-                if None != re.search(reExp, line):
+                if None != re.search(reExp, line.lower()):
                     print ('file:%s - line:%d \n   : %s'%(path,lineNum ,line))
                 lineNum += 1
             f.close()
@@ -38,7 +39,7 @@ def IterateFile(basePath, reExp):
             pass
 
 def main():
-    expression=sys.argv[1]
+    expression=sys.argv[1].lower()
     basePath=sys.argv[2]
     reExp = re.compile(expression, flags=0)
     IterateFile(basePath, reExp)
