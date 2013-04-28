@@ -1,4 +1,4 @@
-#!/home/fshen/Install_samuel/Python/python3.2.3/bin/python3
+#!/usr/bin/env python
 #coding UTF-8
 ######################################################################################
 ##                      only for image search on google.hk                          ##

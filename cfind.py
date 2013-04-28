@@ -1,4 +1,5 @@
-#!/home/fshen/Install_samuel/Python/python3.2.3/bin/python3
+#!/usr/bin/env python
+
 #todo. skip temp file begin with 
 #skip big file
 # add some option

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import sys
 import os
 import re
@@ -36,5 +36,5 @@ def main():
     if 0 == count :
         print("Can't found the %s's time" % (testPart))
     else :
-        print("average time : %d ms" % (time/count))
+        print("average time : %f ms" % (time/count))
 main()
