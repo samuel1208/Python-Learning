@@ -16,18 +16,16 @@ import getopt
 rehide = re.compile("^\..*", flags=0)
 
 def usage():
-    print('./cfind -e "expression" -p path\n')
+    print('-----------------------------------')
+    print('./cfind  "expression"  [path]/[or a file]')
+    print('-----------------------------------')
 
 def IterateFile(basePath, reExp):
 
     if not os.path.exists(basePath):
         print("The path doesn't exist")
-    for fileName in os.listdir(basePath):
-        path = basePath + os.sep + fileName
-        if len(re.findall(rehide,fileName)) > 0:
-            continue
-        if os.path.isdir(path) :
-            IterateFile(path, reExp)
+    
+    if os.path.isfile(basePath):
         try :
             f=open(path)
             lineNum = 1
@@ -38,8 +36,29 @@ def IterateFile(basePath, reExp):
             f.close()
         except:
             pass
+    else:
+        for fileName in os.listdir(basePath):
+            path = basePath + os.sep + fileName
+            if len(re.findall(rehide,fileName)) > 0:
+                continue
+            if os.path.isdir(path) :
+                IterateFile(path, reExp)
+            try :
+                f=open(path)
+                lineNum = 1
+                for line in f:
+                    if None != re.search(reExp, line.lower()):
+                        print ('file:%s - line:%d \n   : %s'%(path,lineNum ,line))
+                    lineNum += 1
+                f.close()
+            except:
+                pass
 
 def main():
+    if(len(sys.argv)<3):
+        print("The input Para is wrong")
+        usage()
+        return
     expression=sys.argv[1].lower()
     basePath=sys.argv[2]
     reExp = re.compile(expression, flags=0)
