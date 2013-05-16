@@ -17,10 +17,11 @@ rehide = re.compile("^\..*", flags=0)
 
 def usage():
     print('-----------------------------------')
-    print('./cfind  "expression"  [path]/[or a file]')
+    print('./cfind  "expression"  [path]/[or a file] -p')
+    print('-p  :  print the content in the file when search in path mode')
     print('-----------------------------------')
 
-def IterateFile(basePath, reExp):
+def IterateFile(basePath, reExp, isPrint):
 
     if not os.path.exists(basePath):
         print("The path doesn't exist")
@@ -42,14 +43,22 @@ def IterateFile(basePath, reExp):
             if len(re.findall(rehide,fileName)) > 0:
                 continue
             if os.path.isdir(path) :
-                IterateFile(path, reExp)
+                IterateFile(path, reExp, isPrint)
             try :
                 f=open(path)
+                isFound = False
                 lineNum = 1
                 for line in f:
                     if None != re.search(reExp, line.lower()):
-                        print ('file:%s - line:%d \n   : %s'%(path,lineNum ,line))
+                        if isPrint:
+                            print ('file:%s - line:%d \n   : %s'%(path,lineNum ,line))
+                        else:
+                            isFound = True
+                            break
                     lineNum += 1
+                if isFound and  False==isPrint:
+                    print('file : %s '%(path))
+
                 f.close()
             except:
                 pass
@@ -61,8 +70,12 @@ def main():
         return
     expression=sys.argv[1].lower()
     basePath=sys.argv[2]
+    if(len(sys.argv)==4):
+        isPrint = sys.argv[3] == "-p"
+    else:
+        isPrint = False
     reExp = re.compile(expression, flags=0)
-    IterateFile(basePath, reExp)
+    IterateFile(basePath, reExp, isPrint)
     print ("Finished")
 
 main()
