@@ -15,7 +15,8 @@ def main():
     testPart = sys.argv[2]
     pattern = re.compile(testPart.upper())
     subPattern = re.compile("\d+\.\d*(?=\D*$)")
-	
+   # subPattern = re.compile("\d*(?=\D*$)")
+
     time = 0
     count = 0
         

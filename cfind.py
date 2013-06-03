@@ -25,18 +25,20 @@ def IterateFile(basePath, reExp, isPrint):
 
     if not os.path.exists(basePath):
         print("The path doesn't exist")
+        return
     
     if os.path.isfile(basePath):
         try :
-            f=open(path)
+            f=open(basePath)
             lineNum = 1
             for line in f:
                 if None != re.search(reExp, line.lower()):
-                    print ('file:%s - line:%d \n   : %s'%(path,lineNum ,line))
+                    print ('file:%s - line:%d \n   : %s'%(basePath,lineNum ,line))
                 lineNum += 1
             f.close()
         except:
-            pass
+            print('ERROR :: Open %s failed'%(basePath))
+            return
     else:
         for fileName in os.listdir(basePath):
             path = basePath + os.sep + fileName
