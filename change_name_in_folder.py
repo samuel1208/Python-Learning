@@ -3,7 +3,9 @@
 import sys, os
 
 pyVersion = sys.version.split()[0]
-print('Python Version : %s \n'%pyVersion)
+print('----------------------------------------------------------------')
+print('Python Version : %s'%pyVersion)
+print('----------------------------------------------------------------')
 
 import getopt
 
@@ -112,12 +114,11 @@ def main():
             bIsDryRun = True
         elif op in ("--help","-h"):
             bIsPrintHelp = True
-
-    path = args[0]        
+         
     if bIsPrintHelp:
         usage()
         return
-
+    path = args[0]
     changeName(path, file_format, prefix, beginNum, bitNum, bIsDryRun)
         
     print ("Finished")
