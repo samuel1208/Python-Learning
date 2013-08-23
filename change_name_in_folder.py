@@ -121,7 +121,17 @@ def main():
     if bIsPrintHelp:
         usage()
         return
-    path = args[0]
+    try:
+        path = args[0]
+        if not os.path.exists(path):
+            raise
+    except IndexError:
+        print("ERROR:: Please input the file path")
+        return 
+    except :
+        print("ERROR:: Path '%s' is not exit"%path)
+        return 
+
     changeName(path, file_format, prefix, beginNum, bitNum, bIsDryRun)
         
     print ("Finished")
