@@ -20,7 +20,7 @@ def getBit(num):
 def usage():
     print('----------------------------------------------------------------')
     print('[[Usage]]::')
-    print('./change_filename_in_folder [Paras] File_Path')
+    print('./{0} [Paras] File_Path'.format(sys.argv[0]))
     print('\n[[para]]::')
     print('\t --file_format/-f : Default value supports all format')
     print('\t --prefix/-p      : Default value is "pre"')
