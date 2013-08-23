@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 import sys, os
-
-pyVersion = sys.version.split()[0]
-print('----------------------------------------------------------------')
-print('Python Version : %s'%pyVersion)
-print('----------------------------------------------------------------')
-
 import getopt
+
+def printPythonVersion():
+    pyVersion = sys.version.split()[0]
+    print('----------------------------------------------------------------')
+    print('Python Version : %s'%pyVersion)
+    print('----------------------------------------------------------------')
+    return 
 
 def getBit(num):
     bitNum=1
@@ -80,7 +81,10 @@ def changeName(basePath, file_format, prefix, beginNum, bitNum, bIsDryRun):
 
     print("Rename  %d files"%(renameNum))
            
+
 def main():
+    printPythonVersion()
+    
     if(len(sys.argv)<2):
         print("ERROR:: The input Para is wrong")
         usage()
