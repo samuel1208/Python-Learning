@@ -21,13 +21,12 @@ def usage():
     print('[[Usage]]::')
     print('./change_filename_in_folder [Paras] File_Path')
     print('\n[[para]]::')
-    print('\t path             : The path of the file which will be renamed')
-    print('\t --file_format/-f : optional Para. Default value is "jpg"')
-    print('\t --prefix/-p      : optional Para. Default value is "img"')
-    print('\t --beginNum/-b    : optional Para. Default value is 0')
-    print('\t --bitNum/-d      : optional Para. Default value is 6')
-    print('\t --dry_run/-n     : only dry_run')
-    print('\t --help/-h     : only print the paras if set')
+    print('\t --file_format/-f : Default value is "jpg"')
+    print('\t --prefix/-p      : Default value is "pre"')
+    print('\t --beginNum/-b    : Default value is 0')
+    print('\t --bitNum/-d      : Default value is 9')
+    print('\t --dry_run/-n     : Print the process, not excute')
+    print('\t --help/-h        : Print usage info')
     print('----------------------------------------------------------------')
 
 def changeName(basePath, file_format, prefix, beginNum, bitNum, bIsDryRun):
@@ -96,9 +95,9 @@ def main():
         return 
 
     file_format = 'all'
-    prefix = "img"
+    prefix = "pre"
     beginNum = 0
-    bitNum = 6
+    bitNum = 9
     bIsDryRun = False
     bIsPrintHelp = False
     for op, arg in opts:
