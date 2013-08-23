@@ -21,11 +21,11 @@ def usage():
     print('[[Usage]]::')
     print('./change_filename_in_folder [Paras] File_Path')
     print('\n[[para]]::')
-    print('\t --file_format/-f : Default value is "jpg"')
+    print('\t --file_format/-f : Default value supports all format')
     print('\t --prefix/-p      : Default value is "pre"')
     print('\t --beginNum/-b    : Default value is 0')
     print('\t --bitNum/-d      : Default value is 9')
-    print('\t --dry_run/-n     : Print the process, not excute')
+    print('\t --dry_run/-n     : Just print the process, not excuting')
     print('\t --help/-h        : Print usage info')
     print('----------------------------------------------------------------')
 
