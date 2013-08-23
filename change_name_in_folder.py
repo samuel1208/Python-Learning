@@ -24,14 +24,15 @@ def usage():
     print('\t --prefix/-p      : optional Para. Default value is "img"')
     print('\t --beginNum/-b    : optional Para. Default value is 0')
     print('\t --bitNum/-d      : optional Para. Default value is 6')
-    print('\t --verbose/-v     : only print the paras if set')
+    print('\t --dry_run/-n     : only dry_run')
     print('\t --help/-h     : only print the paras if set')
     print('----------------------------------------------------------------')
 
-def changeName(basePath, file_format, prefix, beginNum, bitNum):
+def changeName(basePath, file_format, prefix, beginNum, bitNum, bIsDryRun):
 
     num = int(beginNum)
     bitNum = int(bitNum)
+    renameNum = 0
     if not os.path.exists(basePath):
         print("ERRORS:: The path doesn't exist")
         return 
@@ -70,9 +71,13 @@ def changeName(basePath, file_format, prefix, beginNum, bitNum):
 
             oldName = "%s/%s"%(basePath, fileName)
             newName = "%s/%s"%(basePath, newFileName)
-            os.rename(oldName, newName)
+            renameNum = renameNum + 1
+            if bIsDryRun:
+                print(oldName+'  -->  '+newName)
+            else:
+                os.rename(oldName, newName)
 
-    print("Rename  %d files"%(num - int(beginNum)))
+    print("Rename  %d files"%(renameNum))
            
 def main():
     if(len(sys.argv)<2):
@@ -81,7 +86,7 @@ def main():
         return
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "vhf:p:b:d:", ["verbose", "help","file_format=", "prefix=", "beginNum=", "bitNum="])
+        opts, args = getopt.getopt(sys.argv[1:], "vhnf:p:b:d:", ["verbose", "help","dry-run", "file_format=", "prefix=", "beginNum=", "bitNum="])
   
     except getopt.GetoptError:
         print("ERROR:: Errors occur in getting option Paras")
@@ -92,7 +97,7 @@ def main():
     prefix = "img"
     beginNum = 0
     bitNum = 6
-    verbose = 0
+    bIsDryRun = False
     bIsPrintHelp = False
     for op, arg in opts:
         if op in ("-f", "--file_format"):
@@ -103,8 +108,8 @@ def main():
             beginNum = arg
         elif op in ("--bitNum","-d"):
             bitNum = arg
-        elif op in ("--verbose","-v"):
-            verbose = 1
+        elif op in ("--dry-run","-n"):
+            bIsDryRun = True
         elif op in ("--help","-h"):
             bIsPrintHelp = True
 
@@ -113,10 +118,7 @@ def main():
         usage()
         return
 
-    if 1 == verbose:
-        print(file_format, prefix, beginNum, path, bitNum)
-    else:
-        changeName(path, file_format, prefix, beginNum, bitNum)
+    changeName(path, file_format, prefix, beginNum, bitNum, bIsDryRun)
         
     print ("Finished")
 
