@@ -58,11 +58,9 @@ class Retinex(object):
         '''
         if 'L' != grayImg.mode:
             print("The input image must be a gray image")
-            return None
-            
+            return None            
         
-        originImg = numpy.asarray(grayImg)
-        originImg = Retinex.normalize(originImg,1) + 0.01
+        originImg = numpy.asarray(grayImg)+0.01
         blurImg = numpy.asarray(grayImg.filter(ImageFilter.GaussianBlur(hsize)))
         blurImg = blurImg + 0.01
 
