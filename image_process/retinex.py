@@ -51,7 +51,7 @@ class Retinex(object):
     
     
     @staticmethod
-    def single_scale_retinex(grayImg, hsize=15, normalize=0):
+    def single_scale_retinex(grayImg, hsize=30):
         '''
         Notes:
             1.The input Image must be a gray image
@@ -124,7 +124,7 @@ def main():
     srcImg.show(title='src')
 
     if 'SSR' == mode:
-        dstImg = Retinex.single_scale_retinex(srcImg, 15, 1)
+        dstImg = Retinex.single_scale_retinex(srcImg,50)
         dstImg = Image.fromarray(dstImg)
         
     dstImg.show(title='dst')
