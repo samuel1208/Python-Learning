@@ -1,0 +1,10 @@
+=======================================================
+#+TITLE:    Image Process
+#+AUTHOR:   samuel
+#+EMAIL:    shenfei1208@gmail.com
+=======================================================
+
+*  Notes
+**  retinex.py (图像增强算法)
+***  SSR(single scale retinex)
+     R = log(I) - log(I*filter)
