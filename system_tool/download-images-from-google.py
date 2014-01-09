@@ -23,10 +23,10 @@ import threading
 import time
 
 
-URL='https://www.google.com.hk/search?q=pet&num=10&hl=en&newwindow=1&safe=active&qscrl=1&site=imghp&tbm=isch&sout=1&biw=1124&bih=725'
+URL='https://www.google.com.hk/search?newwindow=1&safe=strict&hl=en&biw=1320&bih=677&site=imghp&tbm=isch&sa=1&q=text&oq=text&gs_l=img.3...0.0.0.150.0.0.0.0.0.0.0.0..0.0.ernk_timepromotiona...0...1..32.img..0.0.0.sMu8-IvdPeo'
 baseURL = 'https://www.google.com.hk' 
-maxDepth = 2
-savePATH='/home/fshen/samuel/image/'
+maxDepth = 10
+savePATH='/home/samuel/images'
 #some global pattern of regular expression
 
 ##  the image url in the website
