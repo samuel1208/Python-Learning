@@ -3,6 +3,9 @@ import numpy
 from PIL import ImageFilter, Image
 
 class Retinex(object):
+    """
+    Equalize the illumination of the image. 
+    """
     
     @staticmethod
     def normalize(imgArray, mode=1):

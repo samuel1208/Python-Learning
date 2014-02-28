@@ -1,10 +1,9 @@
 =======================================================
-#+TITLE:    Image Process
+#+TITLE:    Feature
 #+AUTHOR:   samuel
 #+EMAIL:    shenfei1208@gmail.com
 =======================================================
 
 *  Notes
-**  retinex.py (图像增强算法)
-***  SSR(single scale retinex)
-     R = log(I) - log(I*filter)(即原图-模糊过的图像)
+**  BIF_Fea.py (生物激发的特征)
+    由4个部分组成 S1+C1+S2+C2
