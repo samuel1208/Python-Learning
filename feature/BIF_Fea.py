@@ -1,6 +1,24 @@
 #!/usr/bin/env python
-import numpy 
+#-*-coding:utf-8 -*-
+
+import numpy as NM
 from PIL import Image
+
+"""
+Please refer to 
+"Object Recognition with Features Inspired by Visual Cortex"
+"""
+
+def frange(start, stop, step):
+     r = start
+     if step > 0:
+         while r < stop:
+             yield r
+             r += step
+     else:
+         while r > stop:
+             yield r
+             r += step
 
 
 class BIF_Fea(object):
@@ -12,6 +30,49 @@ class BIF_Fea(object):
         ### between time and result. So choose 250  
         self.numPatchesPerSize = 250
         
+        #######################################################
+        ###             gabor_para
+        ###  G(x,y) = exp(-(X^2+γ^2*Y^2)/(2*σ^2))*cos((2π/λ)*X)
+        ###  γ(gamma)
+        ###  λ(lambda)
+        ###  σ(sigma) 
+        ###  X= x*cosθ + y*sinθ
+        ###  Y=-x*sinθ + y*cosθ
+        self.filter_sizes = NM.arange(7, 39, 2)
+
+        self.gabor_thetas = NM.array((0, NM.pi/4, NM.pi/2, NM.pi*3/4))
+        self.div = NM.arange(4, 3.2, -0.05)
+        self.gabor_lambdas = self.filter_sizes*2 / self.div
+        self.gabor_sigmas = self.gabor_lambdas * 0.8
+        ###  spatial aspect ratio: 0.23 < gamma < 0.92
+        self.gabor_gamma = 0.3 
+
+    def GetGaborFilter(self, filter_size, gabor_theta, gabor_sigma,
+                       gabor_lambda, gabor_gamma):
+
+        gabor_filter = NM.empty((filter_size, filter_size),
+                                dtype=NM.float64)
+        center = int(NM.ceil(filter_size/2.0))
+        filter_size_L = center -1
+        filter_size_R = filter_size - filter_size_L -1
+                
+        sigma2 = gabor_sigma * gabor_sigma
+        gamma2 = gabor_gamma * gabor_gamma  
+        for y in xrange(-filter_size_L, filter_size_R+1, 1): 
+            for x in xrange(-filter_size_L, filter_size_R+1, 1): 
+                if NM.sqrt(x*x+y*y) > filter_size/2.0:
+                    E = 0
+                else:
+                    X = x*NM.cos(gabor_theta) + y*NM.sin(gabor_theta)
+                    Y = y*NM.cos(gabor_theta) - x*NM.sin(gabor_theta)
+                    temp1 = NM.exp(-(X*X + gamma2*Y*Y)/(2*sigma2))
+                    temp2 = NM.cos((2*NM.pi/gabor_lambda)*X)
+                    E = temp1*temp2
+                gabor_filter[y+filter_size_L,
+                             x+filter_size_L] = E
+        return gabor_filter
+    
+
     def s1(self):
         pass
 
@@ -31,10 +92,14 @@ class BIF_Fea(object):
         (height, width) = Y_data.shape
 
         #First normalize into [0-1]
-        Y_data_f = numpy.divide(Y_data, 255.0)
-        pass
-    
-
+        Y_data_f = NM.divide(Y_data, 255.0)
+        
+        ### test
+        gabor_filter = self.GetGaborFilter(7,  NM.pi/2,
+                                           self.gabor_sigmas[0],
+                                           self.gabor_lambdas[0],
+                                           0.3)
+        return
 
 
 def main():
@@ -80,7 +145,7 @@ def main():
         srcImg = srcImg.convert('L') 
     srcImg.show(title='src')
 
-    Y_data = numpy.asarray(srcImg, dtype=numpy.uint8)
+    Y_data = NM.asarray(srcImg, dtype=NM.uint8)
 
     fea_extractor = BIF_Fea()
     fea_extractor.extract(Y_data)
