@@ -2,24 +2,13 @@
 #-*-coding:utf-8 -*-
 
 import numpy as NM
+from scipy import signal
 from PIL import Image
 
 """
 Please refer to 
 "Object Recognition with Features Inspired by Visual Cortex"
 """
-
-def frange(start, stop, step):
-     r = start
-     if step > 0:
-         while r < stop:
-             yield r
-             r += step
-     else:
-         while r > stop:
-             yield r
-             r += step
-
 
 class BIF_Fea(object):
     def __init__(self):
@@ -47,9 +36,20 @@ class BIF_Fea(object):
         ###  spatial aspect ratio: 0.23 < gamma < 0.92
         self.gabor_gamma = 0.3 
 
+    def RemoveBorder(self, array, filter_size):
+        """
+        Remove the boundary of the image(half size of filter)
+        """
+        center = (filter_size+1)/2
+        array[0:center-1, :] = 0
+        array[-(center-1):, :] = 0
+        array[:, 0:center-1] = 0
+        array[:, -(center-1):] = 0
+
+        
     def GetGaborFilter(self, filter_size, gabor_theta, gabor_sigma,
                        gabor_lambda, gabor_gamma):
-
+         
         gabor_filter = NM.empty((filter_size, filter_size),
                                 dtype=NM.float64)
         center = int(NM.ceil(filter_size/2.0))
@@ -70,19 +70,26 @@ class BIF_Fea(object):
                     E = temp1*temp2
                 gabor_filter[y+filter_size_L,
                              x+filter_size_L] = E
+         
+        ### Normalize the filter
+        ### 
+        mean = NM.mean(gabor_filter)
+        NM.subtract(gabor_filter, mean, gabor_filter)
+        factor = NM.sqrt(NM.sum(NM.power(gabor_filter, 2)))
+        NM.divide(gabor_filter, factor, gabor_filter)
         return gabor_filter
     
 
-    def s1(self):
+    def S1(self):
         pass
 
-    def c1(self):
+    def C1(self):
         pass
 
-    def s2(self):
+    def S2(self):
         pass
 
-    def c2(self):
+    def C2(self):
         pass
 
     def extract(self, Y_data):
@@ -95,10 +102,24 @@ class BIF_Fea(object):
         Y_data_f = NM.divide(Y_data, 255.0)
         
         ### test
-        gabor_filter = self.GetGaborFilter(7,  NM.pi/2,
-                                           self.gabor_sigmas[0],
-                                           self.gabor_lambdas[0],
+        filter_size = 11
+        gabor_filter = self.GetGaborFilter(filter_size,  NM.pi/2,
+                                           self.gabor_sigmas[2],
+                                           self.gabor_lambdas[2],
                                            0.3)
+        
+        
+        ### Extract S1        
+        Y_data_f_2 = NM.power(Y_data_f, 2)       
+        factor = signal.convolve(Y_data_f_2, 
+                                 NM.ones((filter_size, filter_size)), 
+                                 "same")
+        factor = NM.power(factor, 0.5)
+        s1 = NM.fabs(signal.correlate(Y_data_f, gabor_filter, 'same'))
+        self.RemoveBorder(s1, filter_size)
+        NM.divide(s1, factor, s1)
+
+        ###extract C1       
         return
 
 
@@ -143,7 +164,7 @@ def main():
     srcImg = Image.open(imgPath)
     if 'RGBA' == srcImg.mode or 'RGB' == srcImg.mode:
         srcImg = srcImg.convert('L') 
-    srcImg.show(title='src')
+    #srcImg.show(title='src')
 
     Y_data = NM.asarray(srcImg, dtype=NM.uint8)
 
