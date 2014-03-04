@@ -2,7 +2,8 @@
 #-*-coding:utf-8 -*-
 
 import numpy as NM
-from scipy import signal
+from scipy.ndimage import filters as scipy_f
+from scipy.ndimage import morphology as scipy_morp
 from PIL import Image
 
 """
@@ -27,9 +28,12 @@ class BIF_Fea(object):
         ###  σ(sigma) 
         ###  X= x*cosθ + y*sinθ
         ###  Y=-x*sinθ + y*cosθ
+        self.band_num = 8
+        self.scale_num_in_band = 2
         self.filter_sizes = NM.arange(7, 39, 2)
+        self.pool_grids = NM.arange(8, 24, 2)
 
-        self.gabor_thetas = NM.array((0, NM.pi/4, NM.pi/2, NM.pi*3/4))
+        self.gabor_thetas = NM.array((NM.pi/2, -NM.pi/4, 0, NM.pi/4))
         self.div = NM.arange(4, 3.2, -0.05)
         self.gabor_lambdas = self.filter_sizes*2 / self.div
         self.gabor_sigmas = self.gabor_lambdas * 0.8
@@ -63,16 +67,16 @@ class BIF_Fea(object):
                 if NM.sqrt(x*x+y*y) > filter_size/2.0:
                     E = 0
                 else:
-                    X = x*NM.cos(gabor_theta) + y*NM.sin(gabor_theta)
-                    Y = y*NM.cos(gabor_theta) - x*NM.sin(gabor_theta)
+                    X = x*NM.cos(gabor_theta) - y*NM.sin(gabor_theta)
+                    Y = y*NM.cos(gabor_theta) + x*NM.sin(gabor_theta)
                     temp1 = NM.exp(-(X*X + gamma2*Y*Y)/(2*sigma2))
                     temp2 = NM.cos((2*NM.pi/gabor_lambda)*X)
                     E = temp1*temp2
                 gabor_filter[y+filter_size_L,
                              x+filter_size_L] = E
          
+        ###################################################
         ### Normalize the filter
-        ### 
         mean = NM.mean(gabor_filter)
         NM.subtract(gabor_filter, mean, gabor_filter)
         factor = NM.sqrt(NM.sum(NM.power(gabor_filter, 2)))
@@ -80,16 +84,87 @@ class BIF_Fea(object):
         return gabor_filter
     
 
-    def S1(self):
-        pass
+    def S1C1(self, Y_data_f):
+        """
+        Y_data_f must be a 2D data
+        """
+        c1_list = []
+        height, width = Y_data_f.shape
+        
+        rot_num = len(self.gabor_thetas)
 
-    def C1(self):
-        pass
+        s1 = NM.empty((self.band_num, 
+                       self.scale_num_in_band,
+                       rot_num,
+                       height,
+                       width), dtype=NM.float64)
 
-    def S2(self):
-        pass
+        c1 = NM.empty((self.band_num, 
+                       rot_num,
+                       height,
+                       width), dtype=NM.float64)
+        
+        ### Compute the Normalize factor
+        Y_data_f_2 = NM.power(Y_data_f, 2)       
+        
+        
+        ### Compute S1
+        for idx_band in xrange(self.band_num):
+            for idx_scale in xrange(self.scale_num_in_band):          
+      
+                idx = idx_band*self.scale_num_in_band + idx_scale
+                filter_size = self.filter_sizes[idx]
+                gabor_sigma = self.gabor_sigmas[idx]
+                gabor_lambda = self.gabor_lambdas[idx]
+                ### TODO -- avoid divide 0
+                factor = scipy_f.convolve(Y_data_f_2, 
+                                         NM.ones((filter_size, filter_size)), 
+                                         mode="constant")
+                factor = NM.power(factor, 0.5)
 
-    def C2(self):
+                for idx_r in xrange(rot_num):                   
+                    theta = self.gabor_thetas[idx_r]
+                    gabor_filter=self.GetGaborFilter(filter_size,  
+                                                     theta,
+                                                     gabor_sigma,
+                                                     gabor_lambda,
+                                                     self.gabor_gamma)
+                    temp = NM.fabs(scipy_f.correlate(Y_data_f, 
+                                                     gabor_filter, 
+                                                     mode='constant'))
+                    self.RemoveBorder(temp, filter_size)
+                    NM.divide(temp, factor, temp)
+                    s1[idx_band, idx_scale, idx_r,:,:] = temp
+                    del temp
+
+        ### Compute C1
+        ### pool over scales within band
+        for idx_band in xrange(self.band_num):
+            for idx_r in xrange(rot_num):   
+                T = s1[idx_band, 0, idx_r,:,:]
+                for idx_scale in xrange(1, self.scale_num_in_band): 
+                    T = NM.maximum(s1[idx_band, idx_scale, idx_r,:,:], T)
+                c1[idx_band, idx_r] = T
+
+        ### pool over local neighborhood
+        for idx_band in xrange(self.band_num):
+            grid_size = self.pool_grids[idx_band]
+            gap = grid_size/2
+            grid_size = grid_size*2-1
+            for idx_r in xrange(rot_num):   
+                t = c1[idx_band, idx_r]
+                c1[idx_band, idx_r] = scipy_morp.grey_dilation(t, 
+                                                               size=grid_size, 
+                                                               mode='constant') 
+                t = c1[idx_band, idx_r, 0::gap, 0::gap]
+                c1_list.append(t)
+                        
+        del s1
+        del c1
+        ### subSample            
+        return c1_list
+        
+    def S2C2(self, c1):
         pass
 
     def extract(self, Y_data):
@@ -99,27 +174,12 @@ class BIF_Fea(object):
         (height, width) = Y_data.shape
 
         #First normalize into [0-1]
-        Y_data_f = NM.divide(Y_data, 255.0)
-        
-        ### test
-        filter_size = 11
-        gabor_filter = self.GetGaborFilter(filter_size,  NM.pi/2,
-                                           self.gabor_sigmas[2],
-                                           self.gabor_lambdas[2],
-                                           0.3)
-        
-        
-        ### Extract S1        
-        Y_data_f_2 = NM.power(Y_data_f, 2)       
-        factor = signal.convolve(Y_data_f_2, 
-                                 NM.ones((filter_size, filter_size)), 
-                                 "same")
-        factor = NM.power(factor, 0.5)
-        s1 = NM.fabs(signal.correlate(Y_data_f, gabor_filter, 'same'))
-        self.RemoveBorder(s1, filter_size)
-        NM.divide(s1, factor, s1)
+        Y_data_f = NM.divide(Y_data, 255.0)    
 
-        ###extract C1       
+        ### extract S1C1
+        c1=self.S1C1(Y_data_f)
+        
+        ### extract S2C2
         return
 
 
