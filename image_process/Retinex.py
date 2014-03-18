@@ -69,7 +69,7 @@ class Retinex(object):
 
         dst = numpy.log(originImg/blurImg)
         Retinex.hist_truncate(dst, 0.002, 0.002)
-        return Retinex.normalize(dst,1)
+        return Retinex.normalize(dst,1).astype(numpy.uint8)
         
 
 
@@ -82,11 +82,14 @@ def main():
         print("-----------------------------------------------")
         print('-- usage:: {0}  [Options] image'.format(sys.argv[0]))
         print("-- Options :")
-        print("--\tm|mode : Choose the method to process, default is 'ssr'")
+        print("--\tm|mode   : Choose the method to process, default is 'ssr'")
+        print("--\ts|show   : Show the src and res image ")
+        print("--\th|help   : Choose the method to process, default is 'ssr'")
+        
     ########################################################################
 
     try:
-        options, args = getopt.getopt(sys.argv[1:], "hm:", ["help","mode="])
+        options, args = getopt.getopt(sys.argv[1:], "hm:s", ["help","mode=", "show"])
     except getopt.GetoptError:  
         usage()
         sys.exit(1)
@@ -97,6 +100,7 @@ def main():
         
     supportMode=['SSR']
     bIsHelp = False
+    bIsShow = False
     mode = 'SSR'
     
     for opt , arg in options:
@@ -104,6 +108,8 @@ def main():
             bIsHelp = True;
         if opt in ('-m', '--mode'):
             mode = arg.upper()
+        if opt in ('-s', '--show'):
+            bIsShow = True
 
     if bIsHelp:
         usage()
@@ -117,18 +123,24 @@ def main():
     if not os.path.exists(imgPath):
         print("ERROR:: The input image isn't exist")
         sys.exit(1)
-
+    
+    savePath = "%s_res.bmp"%imgPath
     #process
     srcImg = Image.open(imgPath)
     if 'RGBA' == srcImg.mode or 'RGB' == srcImg.mode:
         srcImg = srcImg.convert('L') 
-    srcImg.show(title='src')
+
+    if bIsShow: 
+        srcImg.show(title='src')
 
     if 'SSR' == mode:
         dstImg = Retinex.single_scale_retinex(srcImg,50)
         dstImg = Image.fromarray(dstImg)
         
-    dstImg.show(title='dst')
+    if bIsShow: 
+        dstImg.show(title='dst')
+        
+    dstImg.save(savePath)
     return 
 
 if '__main__' == __name__:
