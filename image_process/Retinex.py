@@ -84,7 +84,7 @@ def main():
         print("-- Options :")
         print("--\tm|mode   : Choose the method to process, default is 'ssr'")
         print("--\ts|show   : Show the src and res image ")
-        print("--\th|help   : Choose the method to process, default is 'ssr'")
+        print("--\th|help   : Print the usage")
         
     ########################################################################
 
@@ -124,7 +124,7 @@ def main():
         print("ERROR:: The input image isn't exist")
         sys.exit(1)
     
-    savePath = "%s_res.bmp"%imgPath
+    savePath = "%s_%s.bmp"%(os.path.splitext(imgPath)[0], mode)
     #process
     srcImg = Image.open(imgPath)
     if 'RGBA' == srcImg.mode or 'RGB' == srcImg.mode:
