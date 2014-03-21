@@ -140,7 +140,7 @@ class LBP_Fea(object):
             for w in xrange(1, width-1):
                 val_c = grayArr[h,w]
                 val_lbp = 0
-                ### first line
+
                 val = grayArr[h-1, w-1]
                 if val>=val_c:
                     val_lbp += 1;
@@ -150,24 +150,22 @@ class LBP_Fea(object):
                 val = grayArr[h-1, w+1]
                 if val>=val_c:
                     val_lbp += 4;
-                ### second line
-                val = grayArr[h, w-1]
-                if val>=val_c:
-                    val_lbp += 8;
                 val = grayArr[h, w+1]
                 if val>=val_c:
-                    val_lbp += 16;
-                    
-                ### last line
-                val = grayArr[h+1, w-1]
-                if val>=val_c:
-                    val_lbp += 32;
-                val = grayArr[h+1, w]
-                if val>=val_c:
-                    val_lbp += 64;
+                    val_lbp += 8;                    
                 val = grayArr[h+1, w+1]
                 if val>=val_c:
+                    val_lbp += 16;
+                val = grayArr[h+1, w]
+                if val>=val_c:
+                    val_lbp += 32;
+                val = grayArr[h+1, w-1]
+                if val>=val_c:
+                    val_lbp += 64;
+                val = grayArr[h, w-1]
+                if val>=val_c:
                     val_lbp += 128;
+
                 lbpImg[h,w] = lbp_lookup_table[val_lbp]     
         return lbpImg
 
@@ -182,7 +180,7 @@ def main():
         print("Paras::")
         print("\t--radius|-r  :  radius of the neighbor")
         print("\t--neighbor|-n:  neighbor number")
-        print("\t--mode|-m    :  [roi_u2, u2]. Default is u2")
+        print("\t--mode|-m    :  [none, roi_u2, u2]. Default is u2")
         print("\t--show|-s    :  If need to show the temporary result")
         print("\t--help|-h    :  print the help info")
     ########################################################################
