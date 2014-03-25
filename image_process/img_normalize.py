@@ -2,32 +2,23 @@
 import numpy 
 from PIL import ImageFilter, Image
 
-class HistEqualize(object):
+class Img_Normalize(object):
     """
-    Equalize the illumination of the image. 
+    Normalize the illumination of the image. 
     """
     
-    @staticmethod
-    def hist_equalize():
-        pass
+    @staticmethod    
+    def normalize_with_std(gray_arr):
+        std = numpy.std(gray_arr)
+        mean = numpy.mean(gray_arr)
+        res = ((gray_arr-mean)/std)
 
-
-    @staticmethod
-    def histeq(im,nbr_bins=256):
-        #get image histogram
-        imhist,bins = numpy.histogram(im.flatten(),nbr_bins,normed=True)
-        cdf = imhist.cumsum() #cumulative distribution function
-        cdf = 255 * cdf / cdf[-1] #normalize
+        ##arrange to [0-255]
+        maxV = numpy.max(res)
+        minV = numpy.min(res)
+        res = ((res-minV)*255 / (maxV-minV)).astype(numpy.uint8)
         
-        #use linear interpolation of cdf to find new pixel values
-        im2 = numpy.interp(im.flatten(),bins[:-1],cdf).astype(numpy.uint8)
-
-        return im2.reshape(im.shape), cdf
-
-    @staticmethod
-    def hist_equalize_numpy(gray_arr):
-        im,cdf = HistEqualize.histeq(gray_arr)
-        return im
+        return res
 
         
 def main():
@@ -81,7 +72,7 @@ def main():
     if bIsShow: 
         srcImg.show(title='src')
 
-    dstImg = HistEqualize.hist_equalize_numpy(numpy.asarray(srcImg))
+    dstImg = Img_Normalize.normalize_with_std(numpy.asarray(srcImg))
     dstImg = Image.fromarray(dstImg)
         
     if bIsShow: 
